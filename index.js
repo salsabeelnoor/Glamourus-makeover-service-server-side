@@ -4,7 +4,7 @@ const { MongoClient, ServerApiVersion } = require("mongodb");
 require("dotenv").config();
 
 const app = express();
-const port = 5000; //process.env.PORT ||
+const port = process.env.PORT || 5000;
 
 //middleware
 app.use(cors());
@@ -20,6 +20,25 @@ const client = new MongoClient(uri, {
   useUnifiedTopology: true,
   serverApi: ServerApiVersion.v1,
 });
+
+//database api
+async function run() {
+  try {
+    const serviceCollection = client
+      .db("bridalMakeover")
+      .collection("services");
+
+    //services api
+    //create
+    app.post("/services", async (req, res) => {
+      const service = req.body;
+      const result = await serviceCollection.insertOne(service);
+      res.send(result);
+    });
+  } catch {}
+}
+
+run().catch((err) => console.error(err));
 
 app.get("/", (req, res) => {
   res.send("Bridal Makeover Server Running");
