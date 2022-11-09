@@ -27,6 +27,7 @@ async function run() {
     const serviceCollection = client
       .db("bridalMakeover")
       .collection("services");
+    const reviewCollection = client.db("bridalMakeover").collection("reviews");
 
     //services api
     //create
@@ -50,6 +51,40 @@ async function run() {
       const query = { _id: ObjectId(id) };
       const service = await serviceCollection.findOne(query);
       res.send(service);
+    });
+
+    //review
+    //create
+    app.post("/reviews", async (req, res) => {
+      const review = req.body;
+      const result = await reviewCollection.insertOne(review);
+      res.send(result);
+    });
+    //get all reviews
+    app.get("/reviews", async (req, res) => {
+      let query = {};
+      console.log(req.query.serviceNo);
+      //get review of a specific id
+      if (req.query.serviceNo) {
+        query = {
+          serviceNo: req.query.serviceNo,
+        };
+      }
+      //get all reviews by userid
+      if (req.query.userId) {
+        query = {
+          userId: req.query.userId,
+        };
+      }
+      const cursor = reviewCollection.find(query);
+      const reviews = await cursor.toArray();
+      res.send(reviews);
+    });
+    app.get("/reviewUpdate/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const myReview = await reviewCollection.findOne(query);
+      res.send(myReview);
     });
   } catch {}
 }
