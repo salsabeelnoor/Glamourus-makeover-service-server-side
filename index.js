@@ -73,12 +73,6 @@ async function run() {
     });
     //get all reviews
     app.get("/reviews", async (req, res) => {
-      const decoded = req.decoded;
-      console.log("Inside orders API", req.headers.authorization);
-      console.log("Inside query API", req.query.userId);
-      // if (decoded.uid !== req.query.userId) {
-      //   res.status(403).send({ message: "unauthorized access" });
-      // }
       let query = {};
       console.log("This is from service review", req.query.serviceNo);
       //get review of a specific id
