@@ -93,7 +93,8 @@ async function run() {
           userId: req.query.userId,
         };
       }
-      const cursor = reviewCollection.find(query);
+      const sort = { date: -1 };
+      const cursor = reviewCollection.find(query).sort(sort);
       const reviews = await cursor.toArray();
       res.send(reviews);
     });
