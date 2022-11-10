@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
+const jwt = require("jsonwebtoken");
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -28,6 +29,14 @@ async function run() {
       .db("bridalMakeover")
       .collection("services");
     const reviewCollection = client.db("bridalMakeover").collection("reviews");
+
+    app.post("/jwt", (req, res) => {
+      const user = req.body;
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: "1h",
+      });
+      res.send({ token });
+    });
 
     //services api
     //create
@@ -57,13 +66,21 @@ async function run() {
     //create
     app.post("/reviews", async (req, res) => {
       const review = req.body;
+      const d = new Date();
+      review.date = d;
       const result = await reviewCollection.insertOne(review);
       res.send(result);
     });
     //get all reviews
     app.get("/reviews", async (req, res) => {
+      const decoded = req.decoded;
+      console.log("Inside orders API", req.headers.authorization);
+      console.log("Inside query API", req.query.userId);
+      // if (decoded.uid !== req.query.userId) {
+      //   res.status(403).send({ message: "unauthorized access" });
+      // }
       let query = {};
-      console.log(req.query.serviceNo);
+      console.log("This is from service review", req.query.serviceNo);
       //get review of a specific id
       if (req.query.serviceNo) {
         query = {
